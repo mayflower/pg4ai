@@ -35,7 +35,7 @@ make build-multiarch REGISTRY_IMAGE=ghcr.io/<owner>/<repo> IMAGE_TAG=latest
 
 Workflow: `.github/workflows/ci-multiarch.yml`
 
-- PRs: Build + Smoke-Tests für `amd64` und `arm64` (QEMU).
+- PRs: Build für `amd64` + `arm64` (QEMU), Smoke-Tests auf `amd64`.
 - Push auf Branches: identische Tests.
 - Push auf Default-Branch: Publish nach GHCR mit Tags `sha-<shortsha>` und `latest`.
 - Push auf `v*` Tag: Publish nach GHCR mit Versionstag.

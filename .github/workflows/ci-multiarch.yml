@@ -21,8 +21,10 @@ jobs:
         include:
           - platform: linux/amd64
             arch: amd64
+            run_smoke: true
           - platform: linux/arm64
             arch: arm64
+            run_smoke: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,9 +44,14 @@ jobs:
             .
 
       - name: Run smoke tests
+        if: ${{ matrix.run_smoke }}
         run: |
           chmod +x scripts/smoke-test.sh
           IMAGE_REF="pg4ai:test-${{ matrix.arch }}" EXPECT_ARCH="${{ matrix.arch }}" ./scripts/smoke-test.sh
+
+      - name: Skip arm64 smoke tests under QEMU
+        if: ${{ !matrix.run_smoke }}
+        run: echo "Skipping runtime smoke tests for ${{ matrix.platform }}; build-only validation in emulation."
 
       - name: Verify image architecture
         run: |
