@@ -2,7 +2,7 @@
 
 Multi-Arch Docker Image (`linux/amd64`, `linux/arm64`) auf Basis von `postgres:16` mit:
 
-- Apache AGE `PG16/v1.5.0-rc0` (Upstream-Tag für PG16)
+- Apache AGE `PG16/v1.5.0-rc0` (Upstream-Tag fuer PG16)
 - pgvector `v0.7.0`
 
 Die Extensions werden beim ersten DB-Start automatisch via Init-Skript aktiviert.
@@ -35,7 +35,12 @@ make build-multiarch REGISTRY_IMAGE=ghcr.io/<owner>/<repo> IMAGE_TAG=latest
 
 Workflow: `.github/workflows/ci-multiarch.yml`
 
-- PRs: Build für `amd64` + `arm64` (QEMU), Smoke-Tests auf `amd64`.
+- PRs: Build fuer `amd64` + `arm64` (QEMU), Smoke-Tests auf `amd64`.
 - Push auf Branches: identische Tests.
 - Push auf Default-Branch: Publish nach GHCR mit Tags `sha-<shortsha>` und `latest`.
 - Push auf `v*` Tag: Publish nach GHCR mit Versionstag.
+
+## Lizenz
+
+- Dieses Projekt: `Apache-2.0` (siehe `LICENSE`)
+- Drittkomponenten im Image: siehe `THIRD_PARTY_LICENSES.md`
