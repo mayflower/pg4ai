@@ -26,8 +26,9 @@ RUN git clone https://github.com/apache/age.git && \
 RUN git clone https://github.com/pgvector/pgvector.git && \
     cd pgvector && \
     git checkout "${PGVECTOR_VERSION}" && \
-    make PG_CONFIG="${PG_CONFIG}" && \
-    make PG_CONFIG="${PG_CONFIG}" install DESTDIR=/tmp/install-pgvector
+    # Avoid non-portable CPU instructions from pgvector's default -march=native.
+    make PG_CONFIG="${PG_CONFIG}" OPTFLAGS="" && \
+    make PG_CONFIG="${PG_CONFIG}" OPTFLAGS="" install DESTDIR=/tmp/install-pgvector
 
 FROM postgres:16 AS final
 
