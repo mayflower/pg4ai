@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile:1.7
 
-FROM postgres:16 AS builder
+FROM postgres:18.3 AS builder
 
-ARG AGE_VERSION=PG16/v1.5.0-rc0
-ARG PGVECTOR_VERSION=v0.7.0
-ARG PG_CONFIG=/usr/lib/postgresql/16/bin/pg_config
+ARG AGE_VERSION=PG18/v1.7.0-rc0
+ARG PGVECTOR_VERSION=v0.8.2
+ARG PG_CONFIG=/usr/lib/postgresql/18/bin/pg_config
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    postgresql-server-dev-16 \
+    postgresql-server-dev-18 \
     bison \
     flex \
     git \
@@ -30,13 +30,13 @@ RUN git clone https://github.com/pgvector/pgvector.git && \
     make PG_CONFIG="${PG_CONFIG}" OPTFLAGS="" && \
     make PG_CONFIG="${PG_CONFIG}" OPTFLAGS="" install DESTDIR=/tmp/install-pgvector
 
-FROM postgres:16 AS final
+FROM postgres:18.3 AS final
 
-COPY --from=builder /tmp/install-age/usr/lib/postgresql/16/lib/age.so /usr/lib/postgresql/16/lib/
-COPY --from=builder /tmp/install-age/usr/share/postgresql/16/extension/age* /usr/share/postgresql/16/extension/
+COPY --from=builder /tmp/install-age/usr/lib/postgresql/18/lib/age.so /usr/lib/postgresql/18/lib/
+COPY --from=builder /tmp/install-age/usr/share/postgresql/18/extension/age* /usr/share/postgresql/18/extension/
 
-COPY --from=builder /tmp/install-pgvector/usr/lib/postgresql/16/lib/vector.so /usr/lib/postgresql/16/lib/
-COPY --from=builder /tmp/install-pgvector/usr/share/postgresql/16/extension/vector* /usr/share/postgresql/16/extension/
+COPY --from=builder /tmp/install-pgvector/usr/lib/postgresql/18/lib/vector.so /usr/lib/postgresql/18/lib/
+COPY --from=builder /tmp/install-pgvector/usr/share/postgresql/18/extension/vector* /usr/share/postgresql/18/extension/
 
 COPY docker/init/01-extensions.sql /docker-entrypoint-initdb.d/01-extensions.sql
 

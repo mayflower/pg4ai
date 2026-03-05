@@ -8,14 +8,14 @@ Bereitstellung eines produktionsreifen Docker-Images, das die Graph-Datenbank-Fu
 
 ### 2.1 Basis-Komponenten
 
-* **Base Image:** `postgres:16` (Debian-basiert für maximale Kompatibilität beim Kompilieren).
-* **Apache AGE:** Version `v1.5.0` (kompatibel mit PG16).
-* **pgvector:** Version `v0.7.0` oder aktuellster Stable-Release.
+* **Base Image:** `postgres:18.3` (Debian-basiert für maximale Kompatibilität beim Kompilieren).
+* **Apache AGE:** Version `PG18/v1.7.0-rc0` (kompatibel mit PG18).
+* **pgvector:** Version `v0.8.2` (aktueller Stable-Release).
 
 ### 2.2 Build-Anforderungen
 
-* **Multi-Stage Build:** * *Stage 1 (Builder):* Installation von `build-essential`, `postgresql-server-dev-16`, `bison`, `flex`, `git`. Kompilierung beider Extensions.
-* *Stage 2 (Final):* Kopieren der `.so` Dateien und Control-Files in ein sauberes `postgres:16` Image, um die Image-Größe minimal zu halten (~250MB statt >800MB).
+* **Multi-Stage Build:** * *Stage 1 (Builder):* Installation von `build-essential`, `postgresql-server-dev-18`, `bison`, `flex`, `git`. Kompilierung beider Extensions.
+* *Stage 2 (Final):* Kopieren der `.so` Dateien und Control-Files in ein sauberes `postgres:18.3` Image, um die Image-Größe minimal zu halten (~250MB statt >800MB).
 
 
 * **Architektur-Support:** Volle Unterstützung für `linux/amd64` und `linux/arm64` via Docker Buildx.
@@ -52,5 +52,4 @@ Nach dem Start des Containers müssen folgende Befehle erfolgreich sein:
 
 * **Registry:** Ziel ist ein Public Repository (z.B. GitHub Packages oder Docker Hub).
 * **CI/CD:** GitHub Action Workflow zur automatischen Erstellung bei Änderungen am Dockerfile.
-
 

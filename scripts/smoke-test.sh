@@ -28,15 +28,27 @@ elif [[ -n "${EXPECT_ARCH}" ]]; then
   run_args+=(--platform "linux/${EXPECT_ARCH}")
 fi
 
-if ! docker run -d \
-  "${run_args[@]}" \
-  --name "${CONTAINER_NAME}" \
-  -e POSTGRES_USER="${POSTGRES_USER}" \
-  -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
-  -e POSTGRES_DB="${POSTGRES_DB}" \
-  "${IMAGE_REF}" >/dev/null; then
-  echo "Container failed to start."
-  exit 10
+if (( ${#run_args[@]} > 0 )); then
+  if ! docker run -d \
+    "${run_args[@]}" \
+    --name "${CONTAINER_NAME}" \
+    -e POSTGRES_USER="${POSTGRES_USER}" \
+    -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+    -e POSTGRES_DB="${POSTGRES_DB}" \
+    "${IMAGE_REF}" >/dev/null; then
+    echo "Container failed to start."
+    exit 10
+  fi
+else
+  if ! docker run -d \
+    --name "${CONTAINER_NAME}" \
+    -e POSTGRES_USER="${POSTGRES_USER}" \
+    -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+    -e POSTGRES_DB="${POSTGRES_DB}" \
+    "${IMAGE_REF}" >/dev/null; then
+    echo "Container failed to start."
+    exit 10
+  fi
 fi
 
 elapsed=0
@@ -75,7 +87,7 @@ fi
 echo "Running Apache AGE graph check ..."
 if ! docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" "${CONTAINER_NAME}" \
   psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
-  -c "SELECT * FROM ag_catalog.create_graph('my_graph');" >/dev/null; then
+  -c "LOAD 'age'; SET search_path = ag_catalog, \"\$user\", public; SELECT * FROM ag_catalog.create_graph('my_graph');" >/dev/null; then
   echo "AGE SQL check failed."
   docker logs "${CONTAINER_NAME}" || true
   exit 30

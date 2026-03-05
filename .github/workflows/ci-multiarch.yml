@@ -2,6 +2,7 @@ name: ci-multiarch
 
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       - "**"
@@ -38,6 +39,7 @@ jobs:
       - name: Build image
         run: |
           docker buildx build \
+            --pull \
             --platform "${{ matrix.platform }}" \
             --tag "pg4ai:test-${{ matrix.arch }}" \
             --load \
@@ -102,6 +104,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
+          pull: true
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -1,9 +1,9 @@
-# pg4ai: PostgreSQL 16 + Apache AGE + pgvector
+# pg4ai: PostgreSQL 18.3 + Apache AGE + pgvector
 
-Multi-Arch Docker Image (`linux/amd64`, `linux/arm64`) auf Basis von `postgres:16` mit:
+Multi-Arch Docker Image (`linux/amd64`, `linux/arm64`) auf Basis von `postgres:18.3` mit:
 
-- Apache AGE `PG16/v1.5.0-rc0` (Upstream-Tag fuer PG16)
-- pgvector `v0.7.0`
+- Apache AGE `PG18/v1.7.0-rc0` (Upstream-Tag fuer PG18)
+- pgvector `v0.8.2`
 
 Die Extensions werden beim ersten DB-Start automatisch via Init-Skript aktiviert.
 
