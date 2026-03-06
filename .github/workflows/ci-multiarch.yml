@@ -12,10 +12,44 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint GitHub Actions workflows (actionlint)
+        run: |
+          docker run --rm \
+            -v "${PWD}:/repo" \
+            -w /repo \
+            rhysd/actionlint:1.7.7
+
+      - name: Lint Dockerfile (hadolint)
+        run: |
+          docker run --rm -i hadolint/hadolint \
+            hadolint --failure-threshold error - < Dockerfile
+
+      - name: Lint shell scripts (shellcheck)
+        run: |
+          docker run --rm \
+            -v "${PWD}:/work" \
+            -w /work \
+            koalaman/shellcheck-alpine:v0.10.0 \
+            shellcheck scripts/*.sh
+
   test-matrix:
     name: test-${{ matrix.arch }}
     runs-on: ubuntu-latest
+    needs: quality
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -40,6 +74,8 @@ jobs:
         run: |
           docker buildx build \
             --pull \
+            --cache-from type=gha,scope=build-${{ matrix.arch }} \
+            --cache-to type=gha,mode=max,scope=build-${{ matrix.arch }} \
             --platform "${{ matrix.platform }}" \
             --tag "pg4ai:test-${{ matrix.arch }}" \
             --load \
@@ -63,6 +99,7 @@ jobs:
   publish:
     name: publish-ghcr
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     needs: test-matrix
     if: >-
       github.event_name == 'push' &&

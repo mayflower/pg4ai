@@ -65,7 +65,7 @@ done
 ext_wait=0
 until docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" "${CONTAINER_NAME}" \
   psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -Atqc \
-  "SELECT count(*) FROM pg_extension WHERE extname IN ('age', 'vector');" 2>/dev/null | grep -qx "2"; do
+  "SELECT count(*) FROM pg_extension WHERE extname IN ('age', 'vector', 'pg_trgm', 'unaccent');" 2>/dev/null | grep -qx "4"; do
   if (( ext_wait >= STARTUP_TIMEOUT )); then
     echo "Extension init timeout after ${STARTUP_TIMEOUT}s."
     docker logs "${CONTAINER_NAME}" || true
@@ -80,6 +80,15 @@ if ! docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" "${CONTAINER_NAME}" \
   psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
   -c "SELECT '[1,2,3]'::vector;" >/dev/null; then
   echo "Vector SQL check failed."
+  docker logs "${CONTAINER_NAME}" || true
+  exit 30
+fi
+
+echo "Running full-text helper extension checks ..."
+if ! docker exec -e PGPASSWORD="${POSTGRES_PASSWORD}" "${CONTAINER_NAME}" \
+  psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
+  -c "SELECT similarity('color', 'colour'), unaccent('Hôtel');" >/dev/null; then
+  echo "pg_trgm/unaccent SQL check failed."
   docker logs "${CONTAINER_NAME}" || true
   exit 30
 fi

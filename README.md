@@ -4,6 +4,7 @@ Multi-Arch Docker Image (`linux/amd64`, `linux/arm64`) auf Basis von `postgres:1
 
 - Apache AGE `PG18/v1.7.0-rc0` (Upstream-Tag fuer PG18)
 - pgvector `v0.8.2`
+- `pg_trgm` + `unaccent` fuer typo-tolerante Volltext-/Hybrid-Suche
 
 Die Extensions werden beim ersten DB-Start automatisch via Init-Skript aktiviert.
 
